@@ -1,0 +1,3 @@
+#Um arquivo softmasked deve conter letras minúsculas (a, t, g, c) para indicar elementos repetitivos mascarados, 
+#enquanto o restante da sequência (não repetitivo) está em letras maiúsculas.
+zcat Vper.hapA.v1.softmasked.fasta.gz | grep -v "^>" | head -n 100
