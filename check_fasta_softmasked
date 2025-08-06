@@ -6,3 +6,9 @@ zcat Vper.hapA.v1.softmasked.fasta.gz | grep -v "^>" | head -n 100
  zcat Vper.hapA.v1.softmasked.repeatmasker.bed.gz | \
   awk '{sum += $3 - $2} END {print "Bases mascaradas:", sum}'
 Bases mascaradas: 377354520
+
+#Como seu arquivo FASTA está softmasked, as repetições estão representadas por letras minúsculas (por exemplo, atgc), 
+#enquanto as regiões não repetitivas permanecem em maiúsculas (ATGC). Para “desmascarar” (ou seja, transformar tudo em maiúsculo novamente), 
+#você só precisa converter todo o conteúdo para letras maiúsculas.
+
+zcat Vper.hapA.v1.softmasked.fasta.gz | awk '{if ($0 ~ /^>/) {print $0} else {print toupper($0)}}' > Vper.hapA.v1.unmasked.fasta
