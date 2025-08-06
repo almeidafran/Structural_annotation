@@ -1,0 +1,48 @@
+#!/bin/bash
+
+# Diretório de trabalho e arquivos
+GENOME="22042025_renomeado_hap1_only_9chr_peripherica.fa"
+GENOME_BASENAME=$(basename $GENOME .fa)
+THREADS=24
+
+# Ative seu ambiente Conda apropriado (substitua se necessário)
+# conda activate genome_annotation
+
+# Passo 1: Indexar o genoma
+echo "[1/6] Indexando o genoma..."
+makeblastdb -in $GENOME -dbtype nucl
+
+# Passo 2: Identificação baseada em homologia com RepeatMasker
+echo "[2/6] Rodando RepeatMasker com biblioteca de arroz..."
+RepeatMasker -pa $THREADS -species rice -gff -dir repeatmasker_homology $GENOME
+
+# Passo 3: Construção da biblioteca ab initio com RepeatModeler
+echo "[3/6] Rodando RepeatModeler..."
+BuildDatabase -name ${GENOME_BASENAME}_db $GENOME
+RepeatModeler -database ${GENOME_BASENAME}_db -pa $THREADS -LTRStruct
+
+# Passo 4: Usar RepeatMasker com a biblioteca ab initio
+echo "[4/6] RepeatMasker com biblioteca ab initio..."
+RepeatMasker -pa $THREADS -lib ${GENOME_BASENAME}_db-families.fa -gff -dir repeatmasker_abinitio $GENOME
+
+# Passo 5: Unir as duas saídas
+echo "[5/6] Mesclando anotações homologia + ab initio..."
+mkdir -p combined_annotations
+cat repeatmasker_homology/${GENOME}.out repeatmasker_abinitio/${GENOME}.out > combined_annotations/${GENOME_BASENAME}_repeatmasker_combined.out
+cat repeatmasker_homology/${GENOME}.gff repeatmasker_abinitio/${GENOME}.gff > combined_annotations/${GENOME_BASENAME}_repeatmasker_combined.gff
+
+# Passo 6: Identificar TEs intactos com EDTA
+echo "[6/6] Rodando EDTA para TEs intactos..."
+EDTA.pl \
+  --genome $GENOME \
+  --species others \
+  --step all \
+  --threads $THREADS \
+  --overwrite 0 \
+  --sensitive 1 \
+  --anno 1 \
+  --evaluate 1 \
+  --cds NA \
+  --rna NA
+
+echo "✅ Finalizado! Verifique os diretórios 'combined_annotations' e 'EDTA_raw'"
