@@ -27,7 +27,7 @@ gffread -g "$GENOME" -F -w ${OUT}.longestIso.transcripts.fa -x ${OUT}.longestIso
 
 # Contagens, distribuição de éxons, tamanho médio de genes etc.
 agat_sp_statistics.pl --gff "$GFF" -o ${OUT}.gff.stats.txt
-agat sp_statistics --gff "$GFF" -o ${OUT}.gff.stats.txt #if you have used mamba to install agat
+
 
 # Fração de monoéxons (útil pra detectar sob- ou superchamada)
 grep -P "\tmRNA\t" "$GFF" | wc -l
