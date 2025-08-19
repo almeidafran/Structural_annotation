@@ -1,1 +1,71 @@
+#Run braker with RNA-Seq
+
+braker.pl   --genome="/home/externo/francined/2306_assembly_Todd/Vper.hapB.v1.munged/Vper.hapB.v1.softmasked.fasta"   --bam="$(IFS=, ; echo $(ls -1 /home/externo/francined/rna_seq_peripherica/results_hisat2_log_genoma_todd_hapB/*.sorted.bam | sort))"   --species="Vper_hapB"   --workingdir="/home/externo/francined/rna_seq_peripherica/results_braker3_hapB"   --threads=24   --gff3   --UTR=off   --softmasking   --overwrite --GENEMARK_PATH="/home/externo/francined/gmetp_linux_64/bin/gmes"
+# Mon Aug 18 16:56:45 2025: Only RNA-Seq input detected, BRAKER will be executed in ET mode (BRAKER1).
+
+
+#Run braker with RNA-Seq and swprotein
+
+braker.pl   --genome="/home/externo/francined/2306_assembly_Todd/Vper.hapA.v1.munged/Vper.hapA.v1.softmasked.fasta"   --bam="$(IFS=, ; echo $(ls -1 /home/externo/francined/rna_seq_peripherica/results_hisat2_log_genoma_todd_hapA/*.sorted.bam | sort))"   --species="Vper_swprot_hapA" --prot_seq=/home/externo/francined/proteomes_swiss_prot/swissprot_plants.min50.faa  --workingdir="/home/externo/francined/rna_seq_peripherica/results_braker3_with_prot_hapA"   --threads=24   --gff3   --UTR=off   --softmasking   --overwrite --GENEMARK_PATH="/home/externo/francined/gmetp_linux_64/bin/" --PROTHINT_PATH="/home/externo/francined/ProtHint/bin"  --DIAMOND_PATH="/home/externo/francined/gmetp_linux_64/tools"   --SAMTOOLS_PATH="/home/externo/francined/.conda/envs/yahs/bin"
+# Tue Aug 19 14:47:14 2025:Both protein and RNA-Seq data in input detected. BRAKER will be executed in ETP mode (BRAKER3).
+
+#### Organize e gere FASTAs a partir do gff do braker ######
+
+# Paths
+GENOME=/home/externo/francined/2306_assembly_Todd/Vper.hapA.v1.munged/Vper.hapA.v1.softmasked.fasta
+GFF=/home/externo/francined/rna_seq_peripherica/results_braker3_hapA/braker.gff3
+OUT=annot_v1
+
+# Transcritos (mRNA), CDS e proteínas a partir do GFF3 final
+gffread -g "$GENOME" -F -w ${OUT}.transcripts.fa -x ${OUT}.cds.fa -y ${OUT}.proteins.fa "$GFF"
+
+# (Opcional) manter apenas o transcrito mais longo por gene – útil para BUSCO/OrthoFinder
+agat_sp_keep_longest_isoform.pl --gff "$GFF" -o ${OUT}.longestIso.gff3
+gffread -g "$GENOME" -F -w ${OUT}.longestIso.transcripts.fa -x ${OUT}.longestIso.cds.fa -y ${OUT}.longestIso.proteins.fa ${OUT}.longestIso.gff3
+
+#####Estatistica rápida do conjunto gênico####
+
+# Contagens, distribuição de éxons, tamanho médio de genes etc.
+agat_sp_statistics.pl --gff "$GFF" -o ${OUT}.gff.stats.txt
+
+# Fração de monoéxons (útil pra detectar sob- ou superchamada)
+grep -P "\tmRNA\t" "$GFF" | wc -l
+grep -P "\texon\t" "$GFF" | awk '{print $9}' | sed 's/.*Parent=//' | cut -d';' -f1 | sort | uniq -c | awk '$1==1{c++} END{print "monoexon_mRNAs:",c}'
+
+
+
+
+###############Completude com BUSCO (linha Embryophyta)#############
+
+# Exemplo BUSCO v5
+busco -i ${OUT}.proteins.fa -m proteins -l embryophyta_odb10 -o busco_proteins_allIso -c 24
+
+# (Opcional) repetir com longest isoform
+busco -i ${OUT}.longestIso.proteins.fa -m proteins -l embryophyta_odb10 -o busco_proteins_longest -c 24
+
+##### Checar/filtrar genes com dominios TE######
+# Rodar InterProScan primeiro (passo 5) e filtrar por termos de TE:
+# termos comuns: "transposase", "reverse transcriptase", "integrase", "retrotransposon", "RNase H"
+grep -i -E "transposase|retrotransposon|reverse transcriptase|integrase|RNase H" interproscan.tsv | cut -f1 | sort -u > ids_putative_TE.txt
+
+# Gerar GFF sem genes TE-anos (ex.: remove genes cujos mRNAs/prots estejam na lista)
+agat_sp_filter_records_by_attribute.pl --gff "$GFF" --attr ID --values ids_putative_TE.txt --mode remove -o ${OUT}.noTE.gff3
+
+# Regerar FASTAs “noTE” (para downstream)
+gffread -g "$GENOME" -F -w ${OUT}.noTE.transcripts.fa -x ${OUT}.noTE.cds.fa -y ${OUT}.noTE.proteins.fa ${OUT}.noTE.gff3
+
+
+######Anotação Funcional #######
+# 5.1 InterProScan (demora; rode em lote)
+interproscan.sh -i ${OUT}.proteins.fa -f TSV,XML,GFF3 -goterms -iprlookup -pa -dp -cpu 24 -o interproscan
+
+# 5.2 eggNOG-mapper (rápido e muito informativo)
+emapper.py -i ${OUT}.proteins.fa -o emapper --cpu 24 --itype proteins --sensmode fast --report_orthologs --decorate_gff ${OUT}.gff3
+
+# 5.3 (Opcional) DIAMOND contra SwissProt para descrições conservadoras
+diamond makedb --in uniprot_sprot.fasta -d sprot
+diamond blastp -q ${OUT}.proteins.fa -d sprot -o diamond_sprot.m8 -f 6 qseqid sseqid pident length evalue bitscore stitle -k 1 -e 1e-5 -p 24
+
+
+
 
