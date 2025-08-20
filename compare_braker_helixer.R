@@ -9,12 +9,12 @@ suppressMessages({
 })
 
 # --------- caminhos (ajuste se necessário) ----------
-busco_braker  <- "braker/busco/short_summary.txt"
-busco_helixer <- "helixer/busco/short_summary.txt"
-prot_braker   <- "braker/proteins.fa"
-prot_helixer  <- "helixer/proteins.fa"
-agat_braker   <- "braker/braker.stats.txt"
-agat_helixer  <- "helixer/helixer.stats.txt"
+busco_braker  <- "rna_seq_peripherica/results_braker3_hapA/annot_braker_hapA/busco_proteins_allIso/short_summary.specific.liliopsida_odb10.busco_proteins_allIso.txt"
+busco_helixer <- "2306_assembly_Todd/Vper.hapA.v1.munged/Vper.hapA.v1.softmasked.proteins.busco_summary_liliopsida_odb10.txt"
+prot_braker   <- "rna_seq_peripherica/results_braker3_hapA/annot_braker_hapA/braker_hapA.proteins.fa"
+prot_helixer  <- "2306_assembly_Todd/Vper.hapA.v1.munged/Vper.hapA.v1.softmasked.proteins.fasta"
+agat_braker   <- "rna_seq_peripherica/results_braker3_hapA/annot_braker_hapA/braker_hapA.gff.stats.txt"
+agat_helixer  <- "2306_assembly_Todd/statistic_Vper.hapA.muged/Vper.hapA.munged.gff.stats.txt"
 
 # --------- helpers ----------
 read_busco <- function(file, label){
