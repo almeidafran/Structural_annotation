@@ -1,4 +1,32 @@
 #!/usr/bin/env Rscript
+# ================================
+# Pacotes necessários
+# ================================
+required_cran <- c("ggplot2", "dplyr", "tidyr", "readr")
+required_bioc <- c("Biostrings", "GenomicFeatures")
+
+# Instalar CRAN se não existir
+for (pkg in required_cran) {
+  if (!requireNamespace(pkg, quietly = TRUE)) {
+    install.packages(pkg, repos = "https://cloud.r-project.org")
+  }
+  suppressPackageStartupMessages(library(pkg, character.only = TRUE))
+}
+
+# Instalar BiocManager se não existir
+if (!requireNamespace("BiocManager", quietly = TRUE)) {
+  install.packages("BiocManager", repos = "https://cloud.r-project.org")
+}
+
+# Instalar pacotes Bioconductor se não existir
+for (pkg in required_bioc) {
+  if (!requireNamespace(pkg, quietly = TRUE)) {
+    BiocManager::install(pkg, ask = FALSE, update = FALSE)
+  }
+  suppressPackageStartupMessages(library(pkg, character.only = TRUE))
+}
+
+message("✅ Todos os pacotes carregados com sucesso!")
 
 suppressMessages({
   library(Biostrings)
