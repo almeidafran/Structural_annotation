@@ -4,3 +4,6 @@
   -o Vper.hapA.CRL_from_ProtExcluder \
   -t 24 \
   -x /home/externo/francined/scaffolding_vellozia/ProtExcluder.pl
+
+# After running RepeatMasker
+RepeatMasker -pa 24 -lib CRL.fa seu_genoma.fasta
