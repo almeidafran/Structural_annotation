@@ -7,3 +7,16 @@
 
 # After running RepeatMasker
 RepeatMasker -pa 24 -lib CRL.fa seu_genoma.fasta
+
+
+#Rodar sem script
+
+diamond makedb -in /home/externo/francined/scaffolding_vellozia/swissprot_plants.min50.faa -d swissprot_plants
+
+diamond blastx \
+  -d swissprot_plants.dmnd \
+  -q Vper.hapA.v1.unmasked_db-families.fa \
+  -o repeats_vs_swissprot.tab \
+  -e 1e-5 -k 1 --outfmt 6 --threads 24
+
+ProtExcluder.pl repeats_vs_swissprot.tab Vper.hapA.v1.unmasked_db-families.fa
