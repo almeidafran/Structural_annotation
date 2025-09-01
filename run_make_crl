@@ -1,0 +1,6 @@
+./make_crl.sh \
+  -r /home/externo/francined/2306_assembly_Todd/Vper.hapA.v1.unmasked_db-families.fa \
+  -p /home/externo/francined/scaffolding_vellozia/swissprot_plants.min50.faa \
+  -o Vper.hapA.CRL_from_ProtExcluder \
+  -t 24 \
+  -x /home/externo/francined/scaffolding_vellozia/ProtExcluder.pl
