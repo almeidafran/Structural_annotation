@@ -20,3 +20,5 @@ diamond blastx \
   -e 1e-5 -k 1 --outfmt 6 --threads 24
 
 ProtExcluder.pl repeats_vs_swissprot.tab Vper.hapA.v1.unmasked_db-families.fa
+
+#meu comando ../../../scaffolding_vellozia/diamond blastx --query ../repeatmasker_abinitio_hapA/Vper.hapA.v1.unmasked_db-families.fa --max-target-seqs 1 --sensitive --threads 60 --db ../../../scaffolding_vellozia/data_swissprot/uniprot_swissprot.diamond.dmnd --evalue 1e-25 --outfmt 6 --out result_repeatmodeler_hapA.dmdblastx.swp.fmt6.out
