@@ -22,3 +22,17 @@ diamond blastx \
 ProtExcluder.pl repeats_vs_swissprot.tab Vper.hapA.v1.unmasked_db-families.fa
 
 #meu comando ../../../scaffolding_vellozia/diamond blastx --query ../repeatmasker_abinitio_hapA/Vper.hapA.v1.unmasked_db-families.fa --max-target-seqs 1 --sensitive --threads 60 --db ../../../scaffolding_vellozia/data_swissprot/uniprot_swissprot.diamond.dmnd --evalue 1e-25 --outfmt 6 --out result_repeatmodeler_hapA.dmdblastx.swp.fmt6.out
+
+
+#############Comando após erro do ProtExcluder.pl##############
+
+#run diamond
+../../../scaffolding_vellozia/diamond blastx --query ../repeatmasker_abinitio_hapA/Vper.hapA.v1.unmasked_db-families.fa \
+--max-target-seqs 1 --sensitive --threads 60 --db ../../../scaffolding_vellozia/data_swissprot/uniprot_swissprot.diamond.dmnd \
+--evalue 1e-25 --outfmt 6 --out result_repeatmodeler_hapA.dmdblastx.swp.fmt6.out
+
+# Exemplo: remove consensos com hit forte em Swiss-Prot
+awk '$11 <= 1e-5 && $4 >= 60 {print $1}' result_repeatmodeler_hapA.dmdblastx.swp.fmt6.out | sort -u > to_remove.ids
+
+# Cria a CRL
+seqkit grep -v -f to_remove.ids Vper.hapA.v1.unmasked_db-families.fa > CRL.filtered.fa
