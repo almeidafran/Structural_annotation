@@ -1,0 +1,60 @@
+1) StringTie (por amostra) → merge → FASTA
+# Para cada BAM alinhado ao seu genoma (HISAT2/STAR):
+stringtie sample1.bam -p 16 -o s1.gtf --rf   # (use --fr se for FR)
+# ...repita para todas as amostras...
+
+# Merge de todos os GTFs
+stringtie --merge -p 16 -o stringtie_merged.gtf s1.gtf s2.gtf ... sN.gtf
+
+# Extrair cDNAs do genoma
+gffread stringtie_merged.gtf -g genome.fa -w stringtie_transcripts.fa
+
+2) Trinity (duas opções, escolha 1; se puder, rode as duas)
+
+(a) De novo 
+LEFT=$(ls merged_data/*_R1.fastq.gz | paste -sd, -)
+RIGHT=$(ls merged_data/*_R2.fastq.gz | paste -sd, -)
+
+Trinity --seqType fq --left "$LEFT" --right "$RIGHT" \
+  --CPU 32 --max_memory 200G --normalize_max_read_cov 200 \
+  --min_contig_length 200 --SS_lib_type FR \
+  --output trinity_denovo_out
+# Resultado: trinity_denovo_out/Trinity.fasta
+
+
+3) Preparar entrada para o PASA (combinar transcritos)
+cat \
+  stringtie_transcripts.fa \
+  trinity_denovo_out/Trinity.fasta \
+  trinity_gg_out/Trinity-GG.fasta \
+  > transcripts_for_pasa.fa
+
+4) PASA (alinhamento + atualização de anotação p/ UTR)
+# 4.1 criar DB e alinhar transcritos
+Launch_PASA_pipeline.pl -c alignAssembly.config -C -R \
+  -g genome.fa -t transcripts_for_pasa.fa \
+  --ALIGNERS gmap,blat --CPU 32
+
+# 4.2 comparar/atualizar anotação inicial do BRAKER
+Launch_PASA_pipeline.pl -c annotCompare.config -A \
+  -g genome.fa -t transcripts_for_pasa.fa \
+  --CPU 32 --TRANSDECODER \
+  --existing_gff3 results_braker3_hapA/braker.gtf
+# Saída: GFF3 refinado com UTRs (p.ex., pasa_assemblies.gff3)
+
+5) EvidenceModeler (EVM)
+
+Crie weights.txt (exemplo):
+ABINITIO_PREDICTION    braker      2
+TRANSCRIPT             pasa        10
+PROTEIN                exonerate   5
+
+#execute
+EvidenceModeler \
+  --genome genome.fa \
+  --weights weights.txt \
+  --gene_predictions results_braker3_hapA/braker.gff3 \
+  --transcript_alignments pasa_output/pasa_assemblies.gff3 \
+  --protein_alignments exonerate_output/proteins.gff3 \
+  --output_file evm_final.gff3
+
