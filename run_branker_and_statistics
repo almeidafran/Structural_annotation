@@ -10,8 +10,8 @@ braker.pl   --genome="/home/externo/francined/2306_assembly_Todd/Vper.hapA.v1.mu
 # Tue Aug 19 14:47:14 2025:Both protein and RNA-Seq data in input detected. BRAKER will be executed in ETP mode (BRAKER3).
 
 
-#Run braker using github e modificando braker.pl para usar UTR=on
-../braker3/scripts/braker_modificado_java.pl   --genome="/home/externo/francined/2306_assembly_Todd/Vper.hapA.v1.munged/Vper.hapA.v1.softmasked.fasta"   --bam="$(ls -1 /home/externo/francined/rna_seq_peripherica/results_hisat2_log_genoma_todd_hapA/*.sorted.bam | sort | tr '\n' ' ')"   --species="Vper_utr_on_hapA"   --workingdir="/home/externo/francined/rna_seq_peripherica/results_braker1_test_utr_on_hapA"   --threads=24   --gff3   --UTR=on    --overwrite   --GENEMARK_PATH="/home/externo/francined/gmetp_linux_64/bin"   --GUSHR_PATH="/home/externo/francined/gushr"
+#Run braker using github e modificando braker.pl para usar UTR=on#Näo utilizar tem bug
+#../braker3/scripts/braker_modificado_java.pl   --genome="/home/externo/francined/2306_assembly_Todd/Vper.hapA.v1.munged/Vper.hapA.v1.softmasked.fasta"   --bam="$(ls -1 /home/externo/francined/rna_seq_peripherica/results_hisat2_log_genoma_todd_hapA/*.sorted.bam | sort | tr '\n' ' ')"   --species="Vper_utr_on_hapA"   --workingdir="/home/externo/francined/rna_seq_peripherica/results_braker1_test_utr_on_hapA"   --threads=24   --gff3   --UTR=on    --overwrite   --GENEMARK_PATH="/home/externo/francined/gmetp_linux_64/bin"   --GUSHR_PATH="/home/externo/francined/gushr"
 
 #### Organize e gere FASTAs a partir do gff do braker ######
 
