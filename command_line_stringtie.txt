@@ -1,0 +1,1 @@
+./run_stringtie_hapA.sh   -b results_hisat2_log_genoma_todd_hapA/   -g ../2306_assembly_Todd/Vper.hapA.v1.munged/Vper.hapA.v1.softmasked.fasta   -o ./stringtie_hapA_out   -t 24   -s FR   --min-cov 2 --min-frac 0.1 --min-junc 2 --min-len 200
