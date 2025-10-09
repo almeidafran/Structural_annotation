@@ -1,0 +1,15 @@
+#Alinhamento
+~/PASApipeline.v2.5.3/Launch_PASA_pipeline.pl -c pasa_conf/pasa.alignAssembly.Template.txt -C -R \
+-g ../../../Vtub.hapA.v1.munged/Vtub.hapA.v1.softmasked.fasta -t result_seqclean/stringtie_transcripts.fa.clean \
+-T -u result_seqclean/stringtie_transcripts.fa --ALIGNERS blat,gmap,minimap2 --CPU 32
+
+#Anotação 
+ ~/PASApipeline.v2.5.3/scripts/Load_Current_Gene_Annotations.dbi \
+-c pasa_conf/pasa.alignAssembly.Template.txt -g ../../../Vtub.hapA.v1.munged/Vtub.hapA.v1.softmasked.fasta    \
+-P ../results_braker3_with_viridi_hapA/braker.gff3
+
+
+ ~/PASApipeline.v2.5.3/Launch_PASA_pipeline.pl   \
+-c pasa_conf/pasa.annotationCompare.Template.txt -A \
+-g ../../../Vtub.hapA.v1.munged/Vtub.hapA.v1.softmasked.fasta \
+-t result_seqclean/stringtie_transcripts.fa.clean --CPU 40   --TRANSDECODER   --ALT_SPLICE
