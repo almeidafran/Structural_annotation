@@ -10,6 +10,7 @@ awk 'BEGIN{OFS="\t"} $0 ~ /^#/ {print; next} {$2="braker"; print}' braker.gff3 >
 awk 'BEGIN{OFS="\t"} $0 ~ /^#/ {print; next} {$2="helixer"; print}' helixer.gff3 > helixer.src.gff3
 awk 'BEGIN{OFS="\t"} $0 ~ /^#/ {print; next} {$2="miniprot"; print}' miniprot.gff3 > miniprot.src.gff3
 # PASA já costuma vir com source "PASA" ou similar; pode manter e usar esse rótulo no weights.
+cat gene_preds.braker.gff3 gene_preds.helixer.gff3 > gene_predictions.all.gff3
 
 
 ###contriuir  weights.txt 
@@ -24,7 +25,7 @@ ABINITIO_PREDICTION   helixer                     3
         --sample_id Vtub_hapA_evm \
 --weights weights.txt
         --genome ../../../Vtub.hapA.v1.munged/Vtub.hapA.v1.softmasked.fasta \
-        --gene_predictions braker3_viri_hapA.src.gff3,helixer_hapA.src.gff3 \
+        --gene_predictions gene_predictions.all.gff3 \
         --protein_alignments miniprot.src.gff3 \
         --transcript_alignments ../result_pasa_viri_update/pasa_hpA_viri.sqlite.pasa_assemblies.gff3 \
         --segmentSize 100000 \
