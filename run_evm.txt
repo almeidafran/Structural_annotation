@@ -22,6 +22,7 @@ ABINITIO_PREDICTION   helixer                     3
 ##Run EVM
  EVidenceModeler \
         --sample_id Vtub_hapA_evm \
+--weights weights.txt
         --genome ../../../Vtub.hapA.v1.munged/Vtub.hapA.v1.softmasked.fasta \
         --gene_predictions braker3_viri_hapA.src.gff3,helixer_hapA.src.gff3 \
         --protein_alignments miniprot.src.gff3 \
