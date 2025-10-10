@@ -19,3 +19,12 @@ PROTEIN               miniprot                    5
 ABINITIO_PREDICTION   braker                      4
 ABINITIO_PREDICTION   helixer                     3
 
+##Run EVM
+ EVidenceModeler \
+        --sample_id Vtub_hapA_evm \
+        --genome ../../../Vtub.hapA.v1.munged/Vtub.hapA.v1.softmasked.fasta \
+        --gene_predictions braker3_viri_hapA.src.gff3,helixer_hapA.src.gff3 \
+        --protein_alignments miniprot.src.gff3 \
+        --transcript_alignments ../result_pasa_viri_update/pasa_hpA_viri.sqlite.pasa_assemblies.gff3 \
+        --segmentSize 100000 \
+        --overlapSize 10000
