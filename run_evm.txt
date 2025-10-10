@@ -1,0 +1,21 @@
+# índice do genoma
+miniprot -d genome.mpi genome.fasta
+
+# alinhamento proteína->genoma com saída GFF3
+miniprot -t 16 --gff genome.mpi proteins.faa > miniprot.gff3
+
+
+###padronizar os gff
+awk 'BEGIN{OFS="\t"} $0 ~ /^#/ {print; next} {$2="braker"; print}' braker.gff3 > braker.src.gff3
+awk 'BEGIN{OFS="\t"} $0 ~ /^#/ {print; next} {$2="helixer"; print}' helixer.gff3 > helixer.src.gff3
+awk 'BEGIN{OFS="\t"} $0 ~ /^#/ {print; next} {$2="miniprot"; print}' miniprot.gff3 > miniprot.src.gff3
+# PASA já costuma vir com source "PASA" ou similar; pode manter e usar esse rótulo no weights.
+
+
+###contriuir  weights.txt 
+# classe              tipo(source no GFF3)        peso
+TRANSCRIPT            PASA                        10
+PROTEIN               miniprot                    5
+ABINITIO_PREDICTION   braker                      4
+ABINITIO_PREDICTION   helixer                     3
+
